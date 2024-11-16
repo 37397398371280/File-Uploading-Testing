@@ -7,6 +7,7 @@
 </head>
 <body>
     <h1>File Upload Test</h1>
+    <p>V1.0.0 ALPHA</p>
     <form id="uploadForm">
         <label for="fileInput">Choose a file:</label>
         <input type="file" id="fileInput" name="file" required>
@@ -49,7 +50,6 @@
                     responseContainer.innerHTML = `
                         <p><strong>File Uploaded Successfully!</strong></p>
                         <p><strong>Download Link:</strong> <a href="${data.data.downloadPage}" target="_blank">${data.data.downloadPage}</a></p>
-                        <p><strong>Direct Link:</strong> <a href="${data.data.directLink}" target="_blank">${data.data.directLink}</a></p>
                     `;
                 } else {
                     responseContainer.innerHTML = `
