@@ -92,30 +92,39 @@
         }
 
         try {
-            const response = await fetch('https://store1.gofile.io/contents', { // Updated endpoint to match API docs
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'mbKxqXlpPx8BaCZtppE1EBmbzBKH1PBL'
-                },
-                body: JSON.stringify({
-                    contentsId: contentsId // Ensure this matches the API's expected format
-                })
-            });
-
-            const data = await response.json();
-
+            // Split contentsId if multiple IDs are provided (comma-separated)
+            const ids = contentsId.split(',').map(id => id.trim());
             const deleteResponseContainer = document.getElementById('deleteResponseContainer');
-            if (data.status === "ok") {
-                deleteResponseContainer.innerHTML = `
-                    <p><strong>File(s) Deleted Successfully!</strong></p>
-                    <p>Details: ${JSON.stringify(data.data)}</p>
-                `;
-            } else {
-                deleteResponseContainer.innerHTML = `
-                    <p><strong>Error:</strong> ${data.message}</p>
-                `;
+
+            let allResults = [];
+
+            for (const id of ids) {
+                // Construct URL dynamically with content ID
+                const url = `https://api.gofile.io/contents/${id}`;
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'mbKxqXlpPx8BaCZtppE1EBmbzBKH1PBL'
+                    }
+                });
+
+                const data = await response.json();
+                allResults.push({
+                    id: id,
+                    status: data.status,
+                    message: data.status === "ok" ? "Deleted successfully" : data.message
+                });
             }
+
+            // Display all results
+            deleteResponseContainer.innerHTML = `
+                <p><strong>Deletion Results:</strong></p>
+                <ul>
+                    ${allResults.map(result => `
+                        <li><strong>ID:</strong> ${result.id} - <strong>Status:</strong> ${result.message}</li>
+                    `).join('')}
+                </ul>
+            `;
         } catch (error) {
             console.error('Error:', error);
             document.getElementById('deleteResponseContainer').innerHTML = `
