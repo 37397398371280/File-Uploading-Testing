@@ -7,6 +7,11 @@
 </head>
 <body>
     <h1>File Upload Testing</h1>
+    <p>V1.0.0 ALPHA</p>
+    <p>1. No file size limit</p>
+    <p>2. Ephemeral storage only</p>
+    <p>Your content is only available for a limited time. After ten days of inactivity without any downloads, your content is deleted.</p>
+    <p>3. Unlimited downloads, bandwidth and traffic</p>
     <form id="uploadForm">
         <label for="fileInput">Choose a file:</label>
         <input type="file" id="fileInput" name="file" required>
@@ -19,23 +24,9 @@
         <!-- Response will be displayed here -->
     </div>
 
-    <h1>Delete Uploaded Files</h1>
-    <form id="deleteForm">
-        <label for="contentsIdInput">Enter Contents ID(s) (comma-separated):</label>
-        <input type="text" id="contentsIdInput" name="contentsId" required>
-        <br><br>
-        <button type="submit">Delete Files</button>
-    </form>
-
-    <h2>Deletion Response</h2>
-    <div id="deleteResponseContainer">
-        <!-- Deletion response will be displayed here -->
-    </div>
-
     <script>
-        // File Upload Logic
         document.getElementById('uploadForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
+            event.preventDefault(); // Prevent form from submitting normally
 
             const fileInput = document.getElementById('fileInput');
             if (!fileInput.files.length) {
@@ -57,17 +48,13 @@
 
                 const data = await response.json();
 
+                // Display the response data in the HTML
                 const responseContainer = document.getElementById('responseContainer');
                 if (data.status === "ok") {
-                    // Display upload details including contentsId
                     responseContainer.innerHTML = `
                         <p><strong>File Uploaded Successfully!</strong></p>
                         <p><strong>Download Link:</strong> <a href="${data.data.downloadPage}" target="_blank">${data.data.downloadPage}</a></p>
-                        <p><strong>Contents ID:</strong> <span id="uploadedContentsId">${data.data.contentsId}</span></p>
                     `;
-
-                    // Automatically fill the contents ID field for deletion
-                    document.getElementById('contentsIdInput').value = data.data.contentsId;
                 } else {
                     responseContainer.innerHTML = `
                         <p><strong>Error:</strong> ${data.message}</p>
@@ -79,59 +66,6 @@
                 `;
             }
         });
-
-    // File Deletion Logic
-    document.getElementById('deleteForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
-
-        const contentsIdInput = document.getElementById('contentsIdInput');
-        const contentsId = contentsIdInput.value.trim();
-        if (!contentsId) {
-            alert('Please enter at least one Contents ID.');
-            return;
-        }
-
-        try {
-            // Split contentsId if multiple IDs are provided (comma-separated)
-            const ids = contentsId.split(',').map(id => id.trim());
-            const deleteResponseContainer = document.getElementById('deleteResponseContainer');
-
-            let allResults = [];
-
-            for (const id of ids) {
-                // Construct URL dynamically with content ID
-                const url = `https://api.gofile.io/contents/${id}`;
-                const response = await fetch(url, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': 'mbKxqXlpPx8BaCZtppE1EBmbzBKH1PBL'
-                    }
-                });
-
-                const data = await response.json();
-                allResults.push({
-                    id: id,
-                    status: data.status,
-                    message: data.status === "ok" ? "Deleted successfully" : data.message
-                });
-            }
-
-            // Display all results
-            deleteResponseContainer.innerHTML = `
-                <p><strong>Deletion Results:</strong></p>
-                <ul>
-                    ${allResults.map(result => `
-                        <li><strong>ID:</strong> ${result.id} - <strong>Status:</strong> ${result.message}</li>
-                    `).join('')}
-                </ul>
-            `;
-        } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('deleteResponseContainer').innerHTML = `
-                <p><strong>An error occurred:</strong> ${error.message}</p>
-            `;
-        }
-    });
     </script>
 </body>
 </html>
