@@ -13,15 +13,15 @@
     <p>Your content is only available for a limited time. After ten days of inactivity without any downloads, your content is deleted.</p>
     <p>3. Unlimited downloads, bandwidth and traffic</p>
     <form id="uploadForm">
-        <label for="fileInput">Choose files:</label>
-        <input type="file" id="fileInput" name="files" multiple required>
+        <label for="fileInput">Choose a file:</label>
+        <input type="file" id="fileInput" name="file" required>
         <br><br>
-        <button type="submit">Upload Files</button>
+        <button type="submit">Upload File</button>
     </form>
 
-    <h2>Upload Responses</h2>
+    <h2>Upload Response</h2>
     <div id="responseContainer">
-        <!-- Responses will be displayed here -->
+        <!-- Response will be displayed here -->
     </div>
 
     <script>
@@ -30,43 +30,40 @@
 
             const fileInput = document.getElementById('fileInput');
             if (!fileInput.files.length) {
-                alert('Please select at least one file to upload.');
+                alert('Please select a file to upload.');
                 return;
             }
 
-            const responseContainer = document.getElementById('responseContainer');
-            responseContainer.innerHTML = ''; // Clear previous responses
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
 
-            for (const file of fileInput.files) {
-                const formData = new FormData();
-                formData.append("file", file);
+            try {
+                const response = await fetch('https://store1.gofile.io/contents/uploadfile', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'mbKxqXlpPx8BaCZtppE1EBmbzBKH1PBL'
+                    },
+                    body: formData
+                });
 
-                try {
-                    const response = await fetch('https://store1.gofile.io/contents/uploadfile', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'mbKxqXlpPx8BaCZtppE1EBmbzBKH1PBL'
-                        },
-                        body: formData
-                    });
+                const data = await response.json();
 
-                    const data = await response.json();
-
-                    if (data.status === "ok") {
-                        responseContainer.innerHTML += `
-                            <p><strong>${file.name} Uploaded Successfully!</strong></p>
-                            <p><strong>Download Link:</strong> <a href="${data.data.downloadPage}" target="_blank">${data.data.downloadPage}</a></p>
-                        `;
-                    } else {
-                        responseContainer.innerHTML += `
-                            <p><strong>Error uploading ${file.name}:</strong> ${data.message}</p>
-                        `;
-                    }
-                } catch (error) {
-                    responseContainer.innerHTML += `
-                        <p><strong>An error occurred while uploading ${file.name}:</strong> ${error.message}</p>
+                // Display the response data in the HTML
+                const responseContainer = document.getElementById('responseContainer');
+                if (data.status === "ok") {
+                    responseContainer.innerHTML = `
+                        <p><strong>File Uploaded Successfully!</strong></p>
+                        <p><strong>Download Link:</strong> <a href="${data.data.downloadPage}" target="_blank">${data.data.downloadPage}</a></p>
+                    `;
+                } else {
+                    responseContainer.innerHTML = `
+                        <p><strong>Error:</strong> ${data.message}</p>
                     `;
                 }
+            } catch (error) {
+                document.getElementById('responseContainer').innerHTML = `
+                    <p><strong>An error occurred:</strong> ${error.message}</p>
+                `;
             }
         });
     </script>
