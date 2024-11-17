@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload Testing</title>
+    <title>File Upload and Deletion</title>
 </head>
 <body>
-    <h1>File Upload Testing</h1>
+    <h1>File Upload to GoFile</h1>
     <form id="uploadForm">
         <label for="fileInput">Choose a file:</label>
         <input type="file" id="fileInput" name="file" required>
@@ -33,8 +33,6 @@
     </div>
 
     <script>
-        const AUTHORIZATION_KEY = 'mbKxqXlpPx8BaCZtppE1EBmbzBKH1PBL'; // Authorization key used for both upload and delete
-
         // File Upload Logic
         document.getElementById('uploadForm').addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -52,7 +50,7 @@
                 const response = await fetch('https://store1.gofile.io/contents/uploadfile', {
                     method: 'POST',
                     headers: {
-                        'Authorization': AUTHORIZATION_KEY
+                        'Authorization': 'mbKxqXlpPx8BaCZtppE1EBmbzBKH1PBL'
                     },
                     body: formData
                 });
@@ -98,7 +96,7 @@
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': AUTHORIZATION_KEY
+                        'Authorization': 'mbKxqXlpPx8BaCZtppE1EBmbzBKH1PBL'
                     },
                     body: JSON.stringify({
                         contentsId: contentsId
